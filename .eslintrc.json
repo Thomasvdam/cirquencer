@@ -1,0 +1,10 @@
+{
+    "env": {
+        "node": true
+    },
+    "rules": {
+        "indent": ["error", 4],
+        "no-underscore-dangle": "off"
+    },
+    "extends": "airbnb-base"
+}
