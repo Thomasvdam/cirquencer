@@ -24,7 +24,6 @@ export default class TempoView {
         this._lpController.input.on('data', this.onInput);
 
         this._state.heldButton = null;
-        this._state.previousTempo = null;
 
         // Reset LP and redraw
         this._lpController.reset();
@@ -74,15 +73,13 @@ export default class TempoView {
      * @param {Number} newTempo
      */
     onTempoChanged(newTempo) {
-        const updates = numberToPadUpdates(this._state.previousTempo, newTempo);
+        const updates = numberToPadUpdates(newTempo);
 
         updates.forEach((pads) => {
             pads.forEach((padUpdate) => {
                 this._lpController.output.write(padUpdate);
             });
         });
-
-        this._state.previousTempo = newTempo;
     }
 
     /**

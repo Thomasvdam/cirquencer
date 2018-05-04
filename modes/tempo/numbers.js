@@ -1,6 +1,8 @@
 import { Pad, lights } from '../../lib/LaunchPadMini/pad';
-import zip from '../../lib/utils/zip';
 
+/**
+ * The first digit is green, second amber, and the last is green again.
+ */
 const COLOURS = [
     lights.green,
     lights.amber,
@@ -98,24 +100,6 @@ const NUMBERS = {
     blank,
 };
 
-const diff = (from, to) => {
-    const fromNumber = from ? NUMBERS[from] : NUMBERS.blank;
-    const toNumber = to ? NUMBERS[to] : NUMBERS.blank;
-
-    const delta = fromNumber.map((row, columnIndex) => {
-        const rowDelta = row.map((fromValue, rowIndex) => {
-            const toValue = toNumber[columnIndex][rowIndex];
-
-            const result = fromValue === toValue ? null : toValue;
-            return result;
-        });
-
-        return rowDelta;
-    });
-
-    return delta;
-};
-
 /**
  * Calculate how much to move the number over, taking into account that the first digit only takes
  * up 2 spaces instead of 3.
@@ -130,22 +114,22 @@ const calcDisplacement = (position) => {
 };
 
 /**
- * Convert a number delta into the pads that need to be updated.
- * @param {Number[][]} delta
+ * Convert a number digit into the pads that need to be updated.
+ * @param {Number[][]} digit
  * @param {Number} position The digit position. Either 0, 1 or 2.
  * @param {Number} colour
  * @returns {Pad}
  */
-const deltaToPads = (delta, position, colour) => {
-    const pads = delta.reduce((result, row, columnIndex) => {
-        row.forEach((on, rowIndex) => {
-            if (on !== null) {
-                const x = rowIndex + calcDisplacement(position);
-                const key = `${x}:${columnIndex}`;
+const digitToPads = (digit, position, colour) => {
+    const pattern = digit ? NUMBERS[digit] : NUMBERS.blank;
 
-                const value = on ? colour : lights.off;
-                result.push(new Pad(key, value));
-            }
+    const pads = pattern.reduce((result, row, columnIndex) => {
+        row.forEach((on, rowIndex) => {
+            const x = rowIndex + calcDisplacement(position);
+            const key = `${x}:${columnIndex}`;
+
+            const value = on ? colour : lights.off;
+            result.push(new Pad(key, value));
         });
 
         return result;
@@ -172,19 +156,12 @@ const formatNumber = (number) => {
 };
 
 /**
- * @param {Number} from
- * @param {Number} to
+ * @param {Number} number
  */
-export const numberToPadUpdates = (from, to) => {
-    const fromDigits = formatNumber(from);
-    const toDigits = formatNumber(to);
+export const numberToPadUpdates = (number) => {
+    const numberDigits = formatNumber(number);
 
-    const digitPairs = zip(fromDigits, toDigits);
-
-    const result = digitPairs.map((pair, index) => {
-        const delta = diff(pair[0], pair[1]);
-        return deltaToPads(delta, index, COLOURS[index]);
-    });
+    const result = numberDigits.map((digit, index) => digitToPads(digit, index, COLOURS[index]));
 
     return result;
 };
