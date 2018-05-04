@@ -1,8 +1,10 @@
 import MidiStream from 'midi-stream';
 import nodeCleanUp from 'node-cleanup';
 
-import cirquencerState from './lib/Cirquencer/state';
+import Sequencer from './lib/Sequencer';
 import LaunchPadMini from './lib/LaunchPadMini';
+import TempoView from './modes/tempo';
+import MainControls from './MainControls';
 
 MidiStream.getPortNames((err, names) => {
     console.log('names ::: ', names);
@@ -11,22 +13,13 @@ MidiStream.getPortNames((err, names) => {
     const lpStream = MidiStream(lpName);
 
     const lpController = new LaunchPadMini(lpStream);
-    lpController.input.on('data', (pad) => {
-        lpController.output.write(pad);
 
-        if (pad.value === 0) {
-            return;
-        }
+    const activeView = new TempoView(lpController);
+    const controls = new MainControls(lpController);
+    activeView.load();
+    controls.drawButtons();
 
-        if (pad.key === '7:7') {
-            cirquencerState.tempo.set(cirquencerState.tempo() + 5);
-        } else if (pad.key === '0:7') {
-            cirquencerState.tempo.set(cirquencerState.tempo() - 5);
-        }
-    });
-
-
-    cirquencerState.masterClock.on('data', (data) => {
+    Sequencer.masterClock.on('data', (data) => {
         if (data.id === 'test') {
             const [key] = data.args;
 
