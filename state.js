@@ -4,7 +4,8 @@ import modes from './modes/modes';
 
 const cirquencerState = MutantStruct({
     shiftPressed: false,
-    mode: modes.TEMPO,
+    mode: modes.NOTE,
+    selectedSequence: 0,
 });
 
 export default cirquencerState;

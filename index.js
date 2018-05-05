@@ -19,7 +19,7 @@ MidiStream.getPortNames((err, names) => {
     activeView.load();
     controls.drawButtons();
 
-    Sequencer.masterClock.on('data', (data) => {
+    Sequencer.eventStream.on('data', (data) => {
         if (data.id === 'test') {
             const [key] = data.args;
 
