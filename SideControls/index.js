@@ -7,7 +7,7 @@ import getButtons from './buttons';
 import { Pad, lights } from '../lib/LaunchPadMini/pad';
 import buttonCodes from './buttonCodes';
 
-export default class MainControls {
+export default class SideControls {
     constructor(lpController) {
         assert(lpController, 'lpController required');
 
